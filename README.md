@@ -1,4 +1,6 @@
-# style loader for webpack
+# vue-style-loader
+
+> This is a fork of [style-loader](https://github.com/webpack/style-loader), fixing the issue that root-relative URLs are interpreted against chrome:// urls.
 
 ## Usage
 
