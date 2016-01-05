@@ -133,13 +133,6 @@ function createStyleElement(options) {
 	return styleElement;
 }
 
-function createLinkElement(options) {
-	var linkElement = document.createElement("link");
-	linkElement.rel = "stylesheet";
-	insertStyleElement(options, linkElement);
-	return linkElement;
-}
-
 function addStyle(obj, options) {
 	var styleElement, update, remove;
 
@@ -148,19 +141,6 @@ function addStyle(obj, options) {
 		styleElement = singletonElement || (singletonElement = createStyleElement(options));
 		update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
 		remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-	} else if(obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function") {
-		styleElement = createLinkElement(options);
-		update = updateLink.bind(null, styleElement);
-		remove = function() {
-			removeStyleElement(styleElement);
-			if(styleElement.href)
-				URL.revokeObjectURL(styleElement.href);
-		};
 	} else {
 		styleElement = createStyleElement(options);
 		update = applyToTag.bind(null, styleElement);
@@ -213,11 +193,19 @@ function applyToTag(styleElement, obj) {
 	var media = obj.media;
 	var sourceMap = obj.sourceMap;
 
-	if(media) {
-		styleElement.setAttribute("media", media)
+	if (media) {
+		styleElement.setAttribute("media", media);
 	}
 
-	if(styleElement.styleSheet) {
+	if (sourceMap) {
+		// https://developer.chrome.com/devtools/docs/javascript-debugging
+		// this makes source maps inside style tags work properly in Chrome
+		css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */';
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	if (styleElement.styleSheet) {
 		styleElement.styleSheet.cssText = css;
 	} else {
 		while(styleElement.firstChild) {
@@ -225,24 +213,4 @@ function applyToTag(styleElement, obj) {
 		}
 		styleElement.appendChild(document.createTextNode(css));
 	}
-}
-
-function updateLink(linkElement, obj) {
-	var css = obj.css;
-	var media = obj.media;
-	var sourceMap = obj.sourceMap;
-
-	if(sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = linkElement.href;
-
-	linkElement.href = URL.createObjectURL(blob);
-
-	if(oldSrc)
-		URL.revokeObjectURL(oldSrc);
 }
