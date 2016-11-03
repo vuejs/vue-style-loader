@@ -7,6 +7,7 @@ var loaderUtils = require("loader-utils"),
 module.exports = function() {};
 module.exports.pitch = function(remainingRequest) {
 	if(this.cacheable) this.cacheable();
+	if(this.options.target === 'node') return '';
 	var query = loaderUtils.parseQuery(this.query);
 	return [
 		"// style-loader: Adds some css to the DOM by adding a <style> tag",
