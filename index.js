@@ -35,11 +35,12 @@ module.exports.pitch = function (remainingRequest) {
     'if(content.locals) module.exports = content.locals;'
   ]
 
+  var options = loaderUtils.getOptions(this)
   if (!isServer) {
     // on the client: dynamic inject + hot-reload
     var code = [
       '// add the styles to the DOM',
-      'var update = require(' + addStylesClientPath + ')(' + id + ', content, ' + isProduction + ');'
+      'var update = require(' + addStylesClientPath + ')(' + id + ', content, ' + isProduction + ', ' + JSON.stringify(options) + ');'
     ]
     if (!isProduction) {
       code = code.concat([
