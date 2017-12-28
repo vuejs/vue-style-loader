@@ -20,10 +20,10 @@ module.exports.pitch = function (remainingRequest) {
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
   var id = JSON.stringify(hash(request))
 
-  // direct css import from js --> direct (how does this work when inside an async chunk? ...just don't do it)
+  // direct css import from js --> direct for non vue file and manually call `styles.__inject__(ssrContext)` in component lifecycle
   // css import from vue file --> component lifecycle linked
   // style embedded in vue file --> component lifecycle linked
-  var isVue = /"vue":true/.test(remainingRequest)
+  var isVue = /"vue":true/.test(remainingRequest) || loaderUtils.getOptions(this).vue
 
   var shared = [
     '// style-loader: Adds some css to the DOM by adding a <style> tag',
