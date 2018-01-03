@@ -18,7 +18,7 @@ module.exports.pitch = function (remainingRequest) {
   var addStylesServerPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesServer.js'))
 
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
-  var id = JSON.stringify(hash(request))
+  var id = JSON.stringify(hash(request) + path.relative(__dirname, this.resourcePath))
 
   // direct css import from js --> direct for non vue file and manually call `styles.__inject__(ssrContext)` in component lifecycle
   // css import from vue file --> component lifecycle linked
