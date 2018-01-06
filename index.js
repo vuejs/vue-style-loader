@@ -19,11 +19,12 @@ module.exports.pitch = function (remainingRequest) {
 
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
   var id = JSON.stringify(hash(request) + path.relative(__dirname, this.resourcePath))
+  var options = loaderUtils.getOptions(this) || {}
 
   // direct css import from js --> direct for non vue file and manually call `styles.__inject__(ssrContext)` in component lifecycle
   // css import from vue file --> component lifecycle linked
   // style embedded in vue file --> component lifecycle linked
-  var isVue = /"vue":true/.test(remainingRequest) || loaderUtils.getOptions(this).vue
+  var isVue = /"vue":true/.test(remainingRequest) || options.vue
 
   var shared = [
     '// style-loader: Adds some css to the DOM by adding a <style> tag',
