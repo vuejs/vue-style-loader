@@ -21,7 +21,7 @@ module.exports.pitch = function (remainingRequest) {
   var id = JSON.stringify(hash(request + this.resourcePath))
   var options = loaderUtils.getOptions(this) || {}
 
-  // direct css import from js --> direct for non vue file and manually call `styles.__inject__(ssrContext)` in component lifecycle
+  // direct css import from js --> direct, or manually call `styles.__inject__(ssrContext)` with `manualInject` option
   // css import from vue file --> component lifecycle linked
   // style embedded in vue file --> component lifecycle linked
   var isVue = /"vue":true/.test(remainingRequest) || options.manualInject
