@@ -18,7 +18,7 @@ module.exports.pitch = function (remainingRequest) {
   var addStylesServerPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesServer.js'))
 
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
-  var id = JSON.stringify(hash(request + this.resourcePath))
+  var id = JSON.stringify(hash(request + path.relative(__dirname, this.resourcePath)))
   var options = loaderUtils.getOptions(this) || {}
 
   // direct css import from js --> direct, or manually call `styles.__inject__(ssrContext)` with `manualInject` option
