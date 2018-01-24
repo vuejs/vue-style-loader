@@ -36,7 +36,6 @@ module.exports.pitch = function (remainingRequest) {
     'if(content.locals) module.exports = content.locals;'
   ]
 
-  var options = loaderUtils.getOptions(this)
   if (!isServer) {
     // on the client: dynamic inject + hot-reload
     var code = [
