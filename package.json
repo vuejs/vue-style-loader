@@ -1,6 +1,6 @@
 {
   "name": "vue-style-loader",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "author": "Evan You",
   "description": "Vue.js style loader module for webpack",
   "repository": {
