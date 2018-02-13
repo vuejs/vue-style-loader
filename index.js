@@ -87,7 +87,7 @@ module.exports.pitch = function (remainingRequest) {
     } else {
       // normal import
       return shared.concat([
-        'require(' + addStylesServerPath + ')(' + id + ', content, ' + isProduction + ')'
+        'require(' + addStylesServerPath + ').default(' + id + ', content, ' + isProduction + ')'
       ]).join('\n')
     }
   }
