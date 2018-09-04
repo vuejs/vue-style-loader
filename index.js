@@ -6,6 +6,7 @@
 var loaderUtils = require('loader-utils')
 var path = require('path')
 var hash = require('hash-sum')
+var beforeOrder = [];
 
 module.exports = function () {}
 
@@ -18,8 +19,16 @@ module.exports.pitch = function (remainingRequest) {
   var addStylesServerPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesServer.js'))
 
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
-  var id = JSON.stringify(hash(request + path.relative(__dirname, this.resourcePath)))
+  var id = hash(request + path.relative(__dirname, this.resourcePath))
   var options = loaderUtils.getOptions(this) || {}
+
+  // Append id in beforeOrder list
+  beforeOrder.push(id);
+
+  // force ssrId option when injectInImportOrder is true
+  if (options.injectInImportOrder) {
+    options.ssrId = true;
+  }
 
   // direct css import from js --> direct, or manually call `styles.__inject__(ssrContext)` with `manualInject` option
   // css import from vue file --> component lifecycle linked
@@ -40,7 +49,7 @@ module.exports.pitch = function (remainingRequest) {
     // on the client: dynamic inject + hot-reload
     var code = [
       '// add the styles to the DOM',
-      'var update = require(' + addStylesClientPath + ')(' + id + ', content, ' + isProduction + ', ' + JSON.stringify(options) + ');'
+      'var update = require(' + addStylesClientPath + ')(' + JSON.stringify(id) + ', content, ' + isProduction + ', ' + JSON.stringify(options) + ', ' + JSON.stringify(beforeOrder.slice(0, -1)) + ');'
     ]
     if (!isProduction) {
       code = code.concat([
@@ -69,13 +78,13 @@ module.exports.pitch = function (remainingRequest) {
         '// add CSS to SSR context',
         'var add = require(' + addStylesServerPath + ')',
         'module.exports.__inject__ = function (context) {',
-        '  add(' + id + ', content, ' + isProduction + ', context)',
+        '  add(' + JSON.stringify(id) + ', content, ' + isProduction + ', context)',
         '};'
       ]).join('\n')
     } else {
       // normal import
       return shared.concat([
-        'require(' + addStylesServerPath + ')(' + id + ', content, ' + isProduction + ')'
+        'require(' + addStylesServerPath + ')(' + JSON.stringify(id) + ', content, ' + isProduction + ')'
       ]).join('\n')
     }
   }
