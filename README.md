@@ -30,6 +30,12 @@ This is a fork based on [style-loader](https://github.com/webpack/style-loader).
 
   Type: `boolean`. Add `data-vue-ssr-id` attribute to injected `<style>` tags even when not in Node.js. This can be used with pre-rendering (instead of SSR) to avoid duplicate style injection on hydration.
 
+- **injectInImportOrder** (draft):
+
+  Type: `boolean`. Inject HTML DOM Style in import order like in production with ExtractTextPlugin. When value is `true`, `ssrId` option is forced to `true` too.
+  
+  Developed by Ilhasoft's Web Team.
+
 ## Differences from `style-loader`
 
 ### Server-Side Rendering Support
