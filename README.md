@@ -8,7 +8,7 @@ This is a fork based on [style-loader](https://github.com/webpack/style-loader).
 
   Type: `boolean`. When importing the style from a non-vue-file, by default the style is injected as a side effect of the import. When `manualInject` is true, the imported style object exposes a `__inject__` method, which can then be called manually at appropriate timing. If called on the server, the method expects one argument which is the `ssrContext` to attach styles to.
 
-  ``` js
+  ```js
   import styles from 'styles.scss'
 
   export default {
@@ -29,6 +29,10 @@ This is a fork based on [style-loader](https://github.com/webpack/style-loader).
 - **ssrId** (3.1.0+):
 
   Type: `boolean`. Add `data-vue-ssr-id` attribute to injected `<style>` tags even when not in Node.js. This can be used with pre-rendering (instead of SSR) to avoid duplicate style injection on hydration.
+
+- **attributes** (4.0.1+):
+
+  Type: `object`. Add custom attribute to injected `<style>` tags.
 
 ## Differences from `style-loader`
 
