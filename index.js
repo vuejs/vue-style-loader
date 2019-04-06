@@ -22,6 +22,14 @@ module.exports.pitch = function (remainingRequest) {
   var id = JSON.stringify(hash(request + relPath))
   var options = loaderUtils.getOptions(this) || {}
 
+  var insertInto
+  if (typeof options.insertInto === 'function') {
+    insertInto = options.insertInto.toString()
+  }
+  if (typeof options.insertInto === 'string') {
+    insertInto = options.insertInto
+  }
+
   // direct css import from js --> direct, or manually call `styles.__inject__(ssrContext)` with `manualInject` option
   // css import from vue file --> component lifecycle linked
   // style embedded in vue file --> component lifecycle linked
@@ -55,8 +63,10 @@ module.exports.pitch = function (remainingRequest) {
     // on the client: dynamic inject + hot-reload
     var code = [
       '// add the styles to the DOM',
+      'var options = ' + JSON.stringify(options),
+      insertInto ? 'options.insertInto = ' + insertInto : '',
       'var add = require(' + addStylesClientPath + ').default',
-      'var update = add(' + id + ', content, ' + isProduction + ', ' + JSON.stringify(options) + ');'
+      'var update = add(' + id + ', content, ' + isProduction + ', options);'
     ]
     if (!isProduction) {
       code = code.concat([
