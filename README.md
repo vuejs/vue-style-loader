@@ -30,6 +30,28 @@ This is a fork based on [style-loader](https://github.com/webpack/style-loader).
 
   Type: `boolean`. Add `data-vue-ssr-id` attribute to injected `<style>` tags even when not in Node.js. This can be used with pre-rendering (instead of SSR) to avoid duplicate style injection on hydration.
 
+- **insertInto** (4.2.0+):
+
+  Type: `string|function`. Inserts `<style>` to the given position. Returns an `Element` or a `ShadowRoot` where `<style>` tags will be inserted to. If passing `function` to it,  it will be converted to string directly append inline the code, so object literal shorthand syntax is not allowed here.
+
+  ```js
+  {
+    loader: 'vue-style-loader',
+    options: {
+      // all style tag will insert to #my-root-element
+      insertInto: function () {
+        return document.querySelector('#my-root-element')
+      },
+      // or insert into shadow root
+      insertInto: function () {
+        return document.querySelector('#my-root-element').shadowRoot
+      },
+      // or using function string
+      insertInto: 'function() { return document.querySelector("#my-root-element") }',
+    }
+  }
+  ```
+
 ## Differences from `style-loader`
 
 ### Server-Side Rendering Support
