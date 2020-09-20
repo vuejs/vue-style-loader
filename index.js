@@ -36,6 +36,7 @@ module.exports.pitch = function (remainingRequest) {
     '',
     '// load the styles',
     'var content = require(' + request + ');',
+    "if ('default' in content) { content = content.default; }",
     // content list format is [id, css, media, sourceMap]
     "if(typeof content === 'string') content = [[module.id, content, '']];",
     'if(content.locals) module.exports = content.locals;'
