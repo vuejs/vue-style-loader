@@ -1,6 +1,6 @@
 {
   "name": "vue-style-loader",
-  "version": "4.1.2",
+  "version": "4.1.4",
   "author": "Evan You",
   "description": "Vue.js style loader module for webpack",
   "repository": {
@@ -22,5 +22,8 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "conventional-changelog-cli": "^2.0.1",
     "jest": "^22.1.4"
+  },
+  "jest": {
+    "testURL": "http://localhost/"
   }
 }

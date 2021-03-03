@@ -15,7 +15,6 @@ module.exports.pitch = function (remainingRequest) {
   var isProduction = this.minimize || process.env.NODE_ENV === 'production'
   var addStylesClientPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesClient.js'))
   var addStylesServerPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesServer.js'))
-  var addStylesShadowPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesShadow.js'))
 
   var request = loaderUtils.stringifyRequest(this, '!!' + remainingRequest)
   var relPath = path.relative(__dirname, this.resourcePath).replace(/\\/g, '/')
@@ -43,41 +42,41 @@ module.exports.pitch = function (remainingRequest) {
     'if(content.locals) module.exports = content.locals;'
   ]
 
-  // shadowMode is enabled in vue-cli with vue build --target web-component.
-  // exposes the same __inject__ method like SSR
-  if (options.shadowMode) {
-    return shared.concat([
-      '// add CSS to Shadow Root',
-      'var add = require(' + addStylesShadowPath + ').default',
-      'module.exports.__inject__ = function (shadowRoot) {',
-      '  add(' + id + ', content, shadowRoot)',
-      '};'
-    ]).join('\n')
-  } else if (!isServer) {
-    // on the client: dynamic inject + hot-reload
-    var code = [
-      '// add the styles to the DOM',
-      'var add = require(' + addStylesClientPath + ').default',
-      'var update = add(' + id + ', content, ' + isProduction + ', ' + JSON.stringify(options) + ');'
-    ]
-    if (!isProduction) {
-      code = code.concat([
-        '// Hot Module Replacement',
-        'if(module.hot) {',
-        ' // When the styles change, update the <style> tags',
-        ' if(!content.locals) {',
-        '   module.hot.accept(' + request + ', function() {',
-        '     var newContent = require(' + request + ');',
-        "     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];",
-        '     update(newContent);',
-        '   });',
-        ' }',
-        ' // When the module is disposed, remove the <style> tags',
-        ' module.hot.dispose(function() { update(); });',
-        '}'
-      ])
+  if (!isServer) {
+    var code = function(id, isProduction, options) {
+      // style-loader: Adds some css to the DOM by adding a <style> tag
+      var content = require(REQUEST)
+      var addStylesClient = require(ADD_STYLES_CLIENT_PATH).default
+      var install = function(target) {
+        update = addStylesClient(id, content, isProduction, options, target)
+      }
+      var update = null
+      if (typeof content === 'string') content = [[module.id, content, '']]
+      if (content.locals) {
+        module.exports = content.locals
+        return
+      } else if (module.hot) {
+        module.hot.accept(REQUEST, function() {
+          var newContent = require(REQUEST)
+          if (typeof newContent === 'string') newContent = [[module.id, newContent, '']]
+          update(newContent)
+        })
+        module.hot.dispose(function() {
+          update();
+        })
+      }
+      if (options.shadowMode) {
+        module.exports.__inject__ = function(shadowRoot) {
+          install(shadowRoot)
+        }
+      } else {
+        install(typeof document !== 'undefined' && document.head)
+      }
     }
-    return shared.concat(code).join('\n')
+    return `(${code})(${id},${isProduction},${JSON.stringify(options)})`
+      .split('REQUEST').join(request)
+      .split('ADD_STYLES_CLIENT_PATH').join(addStylesClientPath)
+
   } else {
     // on the server: attach to Vue SSR context
     if (isVue) {
