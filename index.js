@@ -11,7 +11,7 @@ var qs = require('querystring')
 module.exports = function () {}
 
 module.exports.pitch = function (remainingRequest) {
-  var isServer = this.target === 'node'
+  var isServer = this.target === 'node' || this.target === 'webworker'
   var isProduction = this.minimize || process.env.NODE_ENV === 'production'
   var addStylesClientPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesClient.js'))
   var addStylesServerPath = loaderUtils.stringifyRequest(this, '!' + path.join(__dirname, 'lib/addStylesServer.js'))
