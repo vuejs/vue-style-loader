@@ -18,10 +18,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
     "@babel/plugin-transform-modules-commonjs": "^7.0.0",
-    "babel-jest": "^22.1.0",
+    "babel-jest": "^24.9.0",
     "conventional-changelog-cli": "^2.0.1",
-    "jest": "^22.1.4"
+    "jest": "^24.9.0"
   }
 }
